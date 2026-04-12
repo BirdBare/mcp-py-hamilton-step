@@ -1,0 +1,30 @@
+[project]
+name = "mcp-py-hamilton-step"
+version = "0.1.0"
+authors = [{ name = "Bradley Bare", email = "bradleybare@gmail.com" }]
+requires-python = "==3.13.*"
+dependencies = [
+    "peewee>=4.0.4,<5",
+    "fastmcp>=3.2.3,<4",
+    "pydantic>=2.12.5,<3", 
+    "python-dotenv>=1.2.2,<2", 
+    "py-hamilton-step @ git+https://github.com/BirdBare/py-hamilton-step",
+]
+
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/py_hamilton_step"]
+
+[tool.uv]
+package = true
+
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["osx-arm64"]
+
+[tool.pixi.dependencies]
+uv = ">=0.11.6,<0.12"
+
