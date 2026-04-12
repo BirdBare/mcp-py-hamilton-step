@@ -1,11 +1,8 @@
-import os
-
-from dotenv import load_dotenv
 from peewee import Model, SqliteDatabase
 
-load_dotenv()
+from mcp_py_hamilton_step.shared.env import HAMILTON_DB_PATH
 
-db = SqliteDatabase(os.getenv("HAMILTON_DB_PATH", "hamilton.db"))
+db = SqliteDatabase(HAMILTON_DB_PATH)
 
 
 class BaseModel(Model):

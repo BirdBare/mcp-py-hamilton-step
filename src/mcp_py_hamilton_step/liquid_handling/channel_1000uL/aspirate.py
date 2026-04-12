@@ -5,10 +5,10 @@ from py_hamilton_step.ml_star import Channel1000ulAspirateChannelConfig, Channel
 from pydantic import BaseModel
 
 from mcp_py_hamilton_step.shared.device import device_operation_lifespan
-from mcp_py_hamilton_step.shared.url import CHANNEL_1000UL_ASPIRATE_PORT
+from mcp_py_hamilton_step.shared.env import CHANNEL_1000UL_ASPIRATE_PORT
 
 mcp = FastMCP(
-    "Channel_1000uL_Aspirate",
+    "Hamilton 1000uLChannel Aspirate",
     instructions="Exposes aspirate functionality for 1mL channels on Hamilton liquid handler.",
     lifespan=device_operation_lifespan,
 )
