@@ -5,7 +5,7 @@ from py_hamilton_step.ml_star import Channel1000ulAspirateChannelConfig, Channel
 from pydantic import BaseModel
 
 from mcp_py_hamilton_step.shared.device import device_operation_lifespan
-from mcp_py_hamilton_step.shared.env import CHANNEL_1000UL_ASPIRATE_PORT
+from mcp_py_hamilton_step.shared.env import CHANNEL_1000UL_ASPIRATE_PORT, MCP_TRANSPORT
 
 mcp = FastMCP(
     "Hamilton 1000uLChannel Aspirate",
@@ -190,4 +190,7 @@ async def aspirate_at_height(
 
 
 if __name__ == "__main__":
-    mcp.run(transport="http", port=CHANNEL_1000UL_ASPIRATE_PORT)
+    if MCP_TRANSPORT == "stdio":
+        mcp.run(transport="stdio")
+    else:
+        mcp.run(transport="http", port=CHANNEL_1000UL_ASPIRATE_PORT)
