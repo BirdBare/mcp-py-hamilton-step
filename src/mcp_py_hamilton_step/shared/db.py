@@ -1,8 +1,8 @@
 from peewee import Model, SqliteDatabase
 
-from mcp_py_hamilton_step.shared.env import HAMILTON_DB_PATH
+from mcp_py_hamilton_step.shared.env import DB_PATH
 
-db = SqliteDatabase(HAMILTON_DB_PATH)
+db = SqliteDatabase(DB_PATH)
 
 
 class BaseModel(Model):
