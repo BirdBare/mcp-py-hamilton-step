@@ -15,8 +15,11 @@ dependencies = [
 build-backend = "hatchling.build"
 requires = ["hatchling"]
 
+[tool.hatch.metadata]
+allow-direct-references = true
+
 [tool.hatch.build.targets.wheel]
-packages = ["src/py_hamilton_step"]
+packages = ["src/mcp_py_hamilton_step"]
 
 [tool.uv]
 package = true
