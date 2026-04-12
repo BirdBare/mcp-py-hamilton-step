@@ -1,0 +1,18 @@
+[workspace]
+authors = ["Bradley Bare <bradleybare@gmail.com>"]
+channels = ["conda-forge"]
+name = "mcp-py-hamilton-step"
+platforms = ["osx-arm64"]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
+python = "3.13.*"
+
+[pypi-dependencies]
+py-hamilton-step = { git = "https://github.com/BirdBare/py-hamilton-step" }
+peewee = ">=4.0.4, <5"
+dotenv = ">=0.9.9, <0.10"
+fastmcp = ">=3.2.3, <4"
+pydantic = ">=2.12.5, <3"
