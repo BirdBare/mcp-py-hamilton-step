@@ -1,14 +1,14 @@
 import os
 
 from dotenv import load_dotenv
-from fastmcp import Context, FastMCP
+from fastmcp import Client, Context, FastMCP
 from fastmcp.server.lifespan import lifespan
 from py_hamilton_step.hamilton import UnixSocketConnection, WindowsVirtualCOMConnection
 from py_hamilton_step.hamilton.device import (
     HamiltonDevice,  # TODO This will eventually need to change to allow specific devices.
 )
 
-from mcp_py_hamilton_step.shared.url import DEVICE_PORT
+from mcp_py_hamilton_step.shared.url import DEVICE_PORT, make_url
 
 load_dotenv()
 
@@ -23,6 +23,12 @@ async def execute_command(context: Context, command_json: dict) -> dict:
     device = context.lifespan_context["device"]
 
     return await device._execute_command_json(command_json)
+
+
+@lifespan
+async def device_operation_lifespan(server):
+    async with Client(make_url(DEVICE_PORT)) as device_client:
+        yield {"device_client": device_client}
 
 
 @lifespan
