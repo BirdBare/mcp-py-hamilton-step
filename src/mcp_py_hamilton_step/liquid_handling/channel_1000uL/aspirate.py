@@ -15,7 +15,6 @@ dotenv.load_dotenv()
 #
 # Required environment variables:
 # MCP_TRANSPORT: Determines the transport method for the MCP server. Can be either 'stdio' or 'http'. Defaults to 'stdio'.
-# HAMILTON_DB_PATH: The file path for the SQLite database used for state tracking. Defaults to 'hamilton.db'.
 # HAMILTON_DEVICE_PORT: The port number for the Hamilton device MCP server. Always runs in http mode. Defaults to 57000.
 #
 # Optional environment variables:
@@ -23,11 +22,9 @@ dotenv.load_dotenv()
 
 MCP_TRANSPORT = typing.cast("typing.Literal['stdio', 'http']", os.getenv("MCP_TRANSPORT", "stdio"))
 
-
 if MCP_TRANSPORT not in ("stdio", "http"):
     raise ValueError(f"Invalid MCP_TRANSPORT: {MCP_TRANSPORT}. Must be 'stdio' or 'http'.")
 
-DB_PATH = os.getenv("HAMILTON_DB_PATH", "hamilton.db")
 DEVICE_PORT = int(os.getenv("HAMILTON_DEVICE_PORT", "57000"))
 CHANNEL_1000UL_ASPIRATE_PORT = int(os.getenv("HAMILTON_CHANNEL_1000UL_ASPIRATE_PORT", "57002"))
 
