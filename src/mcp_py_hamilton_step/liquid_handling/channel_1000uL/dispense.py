@@ -30,13 +30,19 @@ if MCP_TRANSPORT not in ("stdio", "http"):
 
 CHANNEL_1000UL_DISPENSE_PORT = int(os.getenv("HAMILTON_CHANNEL_1000UL_DISPENSE_PORT", "57002"))
 
+#
+# MCP Server
+#
 mcp = FastMCP(
-    "Hamilton 1000uL Channel Dispense",
+    "Hamilton Liquid Handling 1000uL Channel Dispense",
     instructions="Exposes dispense functionality for 1mL channels on Hamilton liquid handler.",
     lifespan=device_operation_lifespan,
 )
 
 
+#
+# Tool implementation
+#
 class BaseDispenseOptions(BaseModel):
     channel_number: int
     labware_id: str

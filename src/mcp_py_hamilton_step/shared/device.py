@@ -27,6 +27,9 @@ CONNECTION_PATH = os.getenv(
 DEVICE_PORT = int(os.getenv("HAMILTON_DEVICE_PORT", "57000"))
 
 
+#
+# Lifespan implementation
+#
 @lifespan
 async def device_operation_lifespan(server):
     async with Client(f"http://localhost:{DEVICE_PORT}/mcp") as device_client:
@@ -79,9 +82,15 @@ async def device_lifespan(server):
         await device.connection.disconnect()
 
 
-mcp = FastMCP("Hamilton Device", lifespan=device_lifespan)
+#
+# MCP Server
+#
+mcp = FastMCP("Hamilton Device Command Execution", lifespan=device_lifespan)
 
 
+#
+# Tool Implementation
+#
 @mcp.tool
 async def execute_command(context: Context, command_json: dict) -> dict:
 

@@ -27,13 +27,19 @@ if MCP_TRANSPORT not in ("stdio", "http"):
 
 CHANNEL_1000UL_ASPIRATE_PORT = int(os.getenv("HAMILTON_CHANNEL_1000UL_ASPIRATE_PORT", "57002"))
 
+#
+# MCP Server
+#
 mcp = FastMCP(
-    "Hamilton 1000uL Channel Aspirate",
+    "Hamilton Liquid Handling 1000uL Channel Aspirate",
     instructions="Exposes aspirate functionality for 1mL channels on Hamilton liquid handler.",
     lifespan=device_operation_lifespan,
 )
 
 
+#
+# Tool implementation
+#
 class BaseAspirateOptions(BaseModel):
     channel_number: int
     labware_id: str

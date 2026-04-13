@@ -27,13 +27,19 @@ if MCP_TRANSPORT not in ("stdio", "http"):
 
 CHANNEL_1000UL_TIP_PICKUP_PORT = int(os.getenv("HAMILTON_CHANNEL_1000UL_TIP_PICKUP_PORT", "57001"))
 
+#
+# MCP Server
+#
 mcp = FastMCP(
-    "Hamilton 1000uL Channel Tip Pickup",
+    "Hamilton Liquid Handling 1000uL Channel Tip Pickup",
     instructions="Exposes tip pickup functionality for 1mL channels on Hamilton liquid handler.",
     lifespan=device_operation_lifespan,
 )
 
 
+#
+# Tool implementation
+#
 class TipPickupOptions(BaseModel):
     channel_number: int
     labware_id: str

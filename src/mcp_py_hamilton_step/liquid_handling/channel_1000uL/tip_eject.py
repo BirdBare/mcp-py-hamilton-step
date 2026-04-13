@@ -27,13 +27,19 @@ if MCP_TRANSPORT not in ("stdio", "http"):
 
 CHANNEL_1000UL_TIP_EJECT_PORT = int(os.getenv("HAMILTON_CHANNEL_1000UL_TIP_EJECT_PORT", "57004"))
 
+#
+# MCP Server
+#
 mcp = FastMCP(
-    "Hamilton 1000uL Channel Tip Eject",
+    "Hamilton Liquid Handling 1000uL Channel Tip Eject",
     instructions="Exposes tip eject functionality for 1mL channels on Hamilton liquid handler.",
     lifespan=device_operation_lifespan,
 )
 
 
+#
+# Tool implementation
+#
 class TipEjectOptions(BaseModel):
     channel_number: int
     labware_id: str
