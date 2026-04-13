@@ -32,7 +32,7 @@ DEVICE_PORT = int(os.getenv("HAMILTON_DEVICE_PORT", "57000"))
 CHANNEL_1000UL_ASPIRATE_PORT = int(os.getenv("HAMILTON_CHANNEL_1000UL_ASPIRATE_PORT", "57002"))
 
 mcp = FastMCP(
-    "Hamilton 1000uLChannel Aspirate",
+    "Hamilton 1000uL Channel Aspirate",
     instructions="Exposes aspirate functionality for 1mL channels on Hamilton liquid handler.",
     lifespan=device_operation_lifespan,
 )
