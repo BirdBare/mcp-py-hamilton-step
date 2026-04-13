@@ -1,5 +1,6 @@
 import os
 
+import dotenv
 from fastmcp import Client, Context, FastMCP
 from fastmcp.server.lifespan import lifespan
 from py_hamilton_step.hamilton import UnixSocketConnection, WindowsVirtualCOMConnection
@@ -7,7 +8,23 @@ from py_hamilton_step.hamilton.device import (
     HamiltonDevice,  # TODO This will eventually need to change to allow specific devices.
 )
 
-from mcp_py_hamilton_step.shared.env import CONNECTION_MODE, CONNECTION_PATH, DEVICE_PORT
+dotenv.load_dotenv()
+
+#
+# ENV Variables
+#
+# Required environment variables:
+# HAMILTON_CONNECTION_MODE: The connection mode for the Hamilton device. Must be either "SOCKET" or "COM". Defaults to "SOCKET".
+# HAMILTON_CONNECTION_PATH: The connection path for the Hamilton device. If connection mode is "SOCKET", this should be the path to the Unix socket. If connection mode is "COM", this should be the virtual COM port. No default value.
+# HAMILTON_DEVICE_PORT: The port number for the Hamilton device MCP server. Always runs in http mode. Defaults to 57000.
+
+
+CONNECTION_MODE = os.getenv("HAMILTON_CONNECTION_MODE", "SOCKET")  # SOCKET or COM
+CONNECTION_PATH = os.getenv(
+    "HAMILTON_CONNECTION_PATH",
+    "NOT_SET",
+)  # either socket path or COM port depending on connection mode
+DEVICE_PORT = int(os.getenv("HAMILTON_DEVICE_PORT", "57000"))
 
 
 @lifespan

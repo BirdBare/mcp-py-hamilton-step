@@ -1,11 +1,35 @@
+import os
 import typing
 
+import dotenv
 from fastmcp import Client, Context, FastMCP
 from py_hamilton_step.ml_star import Channel1000ulAspirateChannelConfig, Channel1000ulAspirateCommand
 from pydantic import BaseModel
 
 from mcp_py_hamilton_step.shared.device import device_operation_lifespan
-from mcp_py_hamilton_step.shared.env import CHANNEL_1000UL_ASPIRATE_PORT, MCP_TRANSPORT
+
+dotenv.load_dotenv()
+
+#
+# ENV Variables
+#
+# Required environment variables:
+# MCP_TRANSPORT: Determines the transport method for the MCP server. Can be either 'stdio' or 'http'. Defaults to 'stdio'.
+# HAMILTON_DB_PATH: The file path for the SQLite database used for state tracking. Defaults to 'hamilton.db'.
+# HAMILTON_DEVICE_PORT: The port number for the Hamilton device MCP server. Always runs in http mode. Defaults to 57000.
+#
+# Optional environment variables:
+# HAMILTON_CHANNEL_1000UL_ASPIRATE_PORT: The port number for the 1000uL channel aspirate MCP server if MCP_TRANSPORT is 'http'. Defaults to 57001.
+
+MCP_TRANSPORT = typing.cast("typing.Literal['stdio', 'http']", os.getenv("MCP_TRANSPORT", "stdio"))
+
+
+if MCP_TRANSPORT not in ("stdio", "http"):
+    raise ValueError(f"Invalid MCP_TRANSPORT: {MCP_TRANSPORT}. Must be 'stdio' or 'http'.")
+
+DB_PATH = os.getenv("HAMILTON_DB_PATH", "hamilton.db")
+DEVICE_PORT = int(os.getenv("HAMILTON_DEVICE_PORT", "57000"))
+CHANNEL_1000UL_ASPIRATE_PORT = int(os.getenv("HAMILTON_CHANNEL_1000UL_ASPIRATE_PORT", "57001"))
 
 mcp = FastMCP(
     "Hamilton 1000uLChannel Aspirate",
@@ -37,6 +61,7 @@ class HeightBasedAspirateOptions(BaseAspirateOptions):
 
 class ChannelAspirationResult(BaseModel):
     exception: str | None
+    aspirated_volume_ul: float | None
     labware_id: str
     labware_position_id: str
 
@@ -62,6 +87,7 @@ def parse_response_data(
 
             result[block_data.num] = ChannelAspirationResult(
                 exception=exception_name,
+                aspirated_volume_ul=block_data.step_data,
                 labware_id=block_data.labware_name,
                 labware_position_id=block_data.labware_pos,
             )
