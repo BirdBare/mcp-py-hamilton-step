@@ -19,7 +19,7 @@ dotenv.load_dotenv()
 # HAMILTON_DEVICE_PORT: The port number for the Hamilton device MCP server. Always runs in http mode. Defaults to 57000.
 #
 # Optional environment variables:
-# HAMILTON_CHANNEL_1000UL_ASPIRATE_PORT: The port number for the 1000uL channel aspirate MCP server if MCP_TRANSPORT is 'http'. Defaults to 57001.
+# HAMILTON_CHANNEL_1000UL_ASPIRATE_PORT: The port number for the 1000uL channel aspirate MCP server if MCP_TRANSPORT is 'http'. Defaults to 57002.
 
 MCP_TRANSPORT = typing.cast("typing.Literal['stdio', 'http']", os.getenv("MCP_TRANSPORT", "stdio"))
 
@@ -29,7 +29,7 @@ if MCP_TRANSPORT not in ("stdio", "http"):
 
 DB_PATH = os.getenv("HAMILTON_DB_PATH", "hamilton.db")
 DEVICE_PORT = int(os.getenv("HAMILTON_DEVICE_PORT", "57000"))
-CHANNEL_1000UL_ASPIRATE_PORT = int(os.getenv("HAMILTON_CHANNEL_1000UL_ASPIRATE_PORT", "57001"))
+CHANNEL_1000UL_ASPIRATE_PORT = int(os.getenv("HAMILTON_CHANNEL_1000UL_ASPIRATE_PORT", "57002"))
 
 mcp = FastMCP(
     "Hamilton 1000uLChannel Aspirate",
