@@ -18,14 +18,14 @@ dotenv.load_dotenv()
 # VENUS_EXECUTOR_PORT: The port number for the Hamilton executor server. Always runs in http mode. Defaults to 57000.
 #
 # Optional environment variables:
-# VENUS_CHANNEL_1000UL_TIP_EJECT_PORT: The port number for the 1000uL channel tip eject MCP server if MCP_TRANSPORT is 'http'. Defaults to 57004.
+# VENUS_CHANNEL_1000UL_EJECT_TIP_PORT: The port number for the 1000uL channel tip eject MCP server if MCP_TRANSPORT is 'http'. Defaults to 57004.
 
 MCP_TRANSPORT = typing.cast("typing.Literal['stdio', 'http']", os.getenv("MCP_TRANSPORT", "stdio"))
 
 if MCP_TRANSPORT not in ("stdio", "http"):
     raise ValueError(f"Invalid MCP_TRANSPORT: {MCP_TRANSPORT}. Must be 'stdio' or 'http'.")
 
-CHANNEL_1000UL_TIP_EJECT_PORT = int(os.getenv("VENUS_CHANNEL_1000UL_TIP_EJECT_PORT", "57004"))
+CHANNEL_1000UL_EJECT_TIP_PORT = int(os.getenv("VENUS_CHANNEL_1000UL_EJECT_TIP_PORT", "57004"))
 
 #
 # MCP Server
@@ -40,13 +40,13 @@ mcp = FastMCP(
 #
 # Tool implementation
 #
-class TipEjectOptions(BaseModel):
+class EjectTipOptions(BaseModel):
     channel_number: int
     labware_id: str
     labware_position_id: str
 
 
-class ChannelEjectResult(BaseModel):
+class EjectTipResult(BaseModel):
     channel_number: int
     exception: str | None
     labware_id: str
@@ -54,9 +54,9 @@ class ChannelEjectResult(BaseModel):
 
 
 def parse_response_data(
-    channel_options: list[TipEjectOptions],
+    channel_options: list[EjectTipOptions],
     response_json: dict,
-) -> list[ChannelEjectResult]:
+) -> list[EjectTipResult]:
     response = Channel1000ulTipEjectCommand.parse_response(response_json)
 
     executed_channels = [option.channel_number for option in channel_options]
@@ -74,7 +74,7 @@ def parse_response_data(
                 exception_name = block_data.main_err.__name__
 
             result.append(
-                ChannelEjectResult(
+                EjectTipResult(
                     channel_number=block_data.num,
                     exception=exception_name,
                     labware_id=block_data.labware_name,
@@ -86,10 +86,10 @@ def parse_response_data(
 
 
 @mcp.tool
-async def tip_eject(
+async def eject_tips(
     context: Context,
-    channel_options: list[TipEjectOptions],
-) -> list[ChannelEjectResult]:
+    channel_options: list[EjectTipOptions],
+) -> list[EjectTipResult]:
     """Ejects tips for the specified channels. Returns a dictionary mapping channel numbers to the result of the operation."""
     channel_configs = []
     for option in channel_options:
@@ -110,11 +110,11 @@ async def tip_eject(
 
     response_data = call_tool_data.data
 
-    return parse_response_data(typing.cast("list[TipEjectOptions]", channel_options), response_data)
+    return parse_response_data(typing.cast("list[EjectTipOptions]", channel_options), response_data)
 
 
 if __name__ == "__main__":
     if MCP_TRANSPORT == "stdio":
         mcp.run(transport="stdio")
     else:
-        mcp.run(transport="http", port=CHANNEL_1000UL_TIP_EJECT_PORT)
+        mcp.run(transport="http", port=CHANNEL_1000UL_EJECT_TIP_PORT)

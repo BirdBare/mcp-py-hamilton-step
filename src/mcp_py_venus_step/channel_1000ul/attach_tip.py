@@ -18,21 +18,21 @@ dotenv.load_dotenv()
 # VENUS_EXECUTOR_PORT: The port number for the Hamilton executor server. Always runs in http mode. Defaults to 57000.
 #
 # Optional environment variables:
-# VENUS_CHANNEL_1000UL_TIP_PICKUP_PORT: The port number for the 1000uL channel tip pickup MCP server if MCP_TRANSPORT is 'http'. Defaults to 57001.
+# VENUS_CHANNEL_1000UL_ATTACH_TIP_PORT: The port number for the 1000uL channel tip attach MCP server if MCP_TRANSPORT is 'http'. Defaults to 57001.
 
 MCP_TRANSPORT = typing.cast("typing.Literal['stdio', 'http']", os.getenv("MCP_TRANSPORT", "stdio"))
 
 if MCP_TRANSPORT not in ("stdio", "http"):
     raise ValueError(f"Invalid MCP_TRANSPORT: {MCP_TRANSPORT}. Must be 'stdio' or 'http'.")
 
-CHANNEL_1000UL_TIP_PICKUP_PORT = int(os.getenv("VENUS_CHANNEL_1000UL_TIP_PICKUP_PORT", "57001"))
+CHANNEL_1000UL_TIP_ATTACH_PORT = int(os.getenv("VENUS_CHANNEL_1000UL_ATTACH_TIP_PORT", "57001"))
 
 #
 # MCP Server
 #
 mcp = FastMCP(
-    "Hamilton Liquid Handling 1000uL Channel Tip Pickup",
-    instructions="Exposes tip pickup functionality for 1mL channels on Hamilton liquid handler.",
+    "Hamilton Liquid Handling 1000uL Channel Tip Attach",
+    instructions="Exposes tip attach functionality for 1mL channels on Hamilton liquid handler.",
     lifespan=executor_client_lifespan,
 )
 
@@ -40,13 +40,13 @@ mcp = FastMCP(
 #
 # Tool implementation
 #
-class TipPickupOptions(BaseModel):
+class AttachTipOptions(BaseModel):
     channel_number: int
     labware_id: str
     labware_position_id: str
 
 
-class ChannelPickupResult(BaseModel):
+class AttachTipResult(BaseModel):
     channel_number: int
     exception: str | None
     labware_id: str
@@ -54,9 +54,9 @@ class ChannelPickupResult(BaseModel):
 
 
 def parse_response_data(
-    channel_options: list[TipPickupOptions],
+    channel_options: list[AttachTipOptions],
     response_json: dict,
-) -> list[ChannelPickupResult]:
+) -> list[AttachTipResult]:
     response = Channel1000ulTipPickupCommand.parse_response(response_json)
 
     executed_channels = [option.channel_number for option in channel_options]
@@ -74,7 +74,7 @@ def parse_response_data(
                 exception_name = block_data.main_err.__name__
 
             result.append(
-                ChannelPickupResult(
+                AttachTipResult(
                     channel_number=block_data.num,
                     exception=exception_name,
                     labware_id=block_data.labware_name,
@@ -86,11 +86,11 @@ def parse_response_data(
 
 
 @mcp.tool
-async def tip_pickup(
+async def attach_tips(
     context: Context,
-    channel_options: list[TipPickupOptions],
-) -> list[ChannelPickupResult]:
-    """Picks up tips for the specified channels. Returns a dictionary mapping channel numbers to the result of the operation."""
+    channel_options: list[AttachTipOptions],
+) -> list[AttachTipResult]:
+    """Attaches tips for the specified channels. Returns a dictionary mapping channel numbers to the result of the operation."""
     channel_configs = []
     for option in channel_options:
         config = Channel1000ulTipPickupChannelConfig(
@@ -110,11 +110,11 @@ async def tip_pickup(
 
     response_data = call_tool_data.data
 
-    return parse_response_data(typing.cast("list[TipPickupOptions]", channel_options), response_data)
+    return parse_response_data(typing.cast("list[AttachTipOptions]", channel_options), response_data)
 
 
 if __name__ == "__main__":
     if MCP_TRANSPORT == "stdio":
         mcp.run(transport="stdio")
     else:
-        mcp.run(transport="http", port=CHANNEL_1000UL_TIP_PICKUP_PORT)
+        mcp.run(transport="http", port=CHANNEL_1000UL_TIP_ATTACH_PORT)
