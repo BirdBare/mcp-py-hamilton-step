@@ -62,6 +62,7 @@ class HeightBasedAspirateOptions(BaseAspirateOptions):
 
 
 class ChannelAspirationResult(BaseModel):
+    channel_number: int
     exception: str | None
     aspirated_volume_ul: float | None
     labware_id: str
@@ -71,27 +72,32 @@ class ChannelAspirationResult(BaseModel):
 def parse_response_data(
     channel_options: list[BaseAspirateOptions],
     response_json: dict,
-) -> dict[int, ChannelAspirationResult]:
+) -> list[ChannelAspirationResult]:
     response = Channel1000ulAspirateCommand.parse_response(response_json)
 
-    result: dict[int, typing.Any] = {option.channel_number: None for option in channel_options}
+    executed_channels = [option.channel_number for option in channel_options]
+
+    result = []
 
     for block_data in response.channel_sequences_with_recovery_details.block_data:
-        if block_data.num in result:
+        if block_data.num in executed_channels:
             if response.channel_sequences_with_recovery_details.err_flag == "Fatal error":
                 exception_name = "FatalError"
 
             elif block_data.main_err is None:
-                exception_name = "None"
+                exception_name = None
 
             else:
                 exception_name = block_data.main_err.__name__
 
-            result[block_data.num] = ChannelAspirationResult(
-                exception=exception_name,
-                aspirated_volume_ul=block_data.step_data,
-                labware_id=block_data.labware_name,
-                labware_position_id=block_data.labware_pos,
+            result.append(
+                ChannelAspirationResult(
+                    channel_number=block_data.num,
+                    exception=exception_name,
+                    aspirated_volume_ul=block_data.step_data,
+                    labware_id=block_data.labware_name,
+                    labware_position_id=block_data.labware_pos,
+                ),
             )
 
     return result
@@ -101,8 +107,8 @@ def parse_response_data(
 async def aspirate_with_capacitive_liquid_level_detection(
     context: Context,
     channel_options: list[LiquidLevelDetectionAspirateOptions],
-) -> dict[int, ChannelAspirationResult]:
-    """Aspirates a specified volume of liquid from a location using capacitive liquid level detection to detect the surface of the liquid. Returns a dictionary mapping channel numbers to the result of the operation."""
+) -> list[ChannelAspirationResult]:
+    """Aspirates a specified volume of liquid from a location using capacitive liquid level detection to detect the surface of the liquid. Returns a list of results for each channel."""
     channel_configs = []
     for option in channel_options:
         config = Channel1000ulAspirateChannelConfig(
@@ -141,8 +147,8 @@ async def aspirate_with_capacitive_liquid_level_detection(
 async def aspirate_with_pressure_liquid_level_detection(
     context: Context,
     channel_options: list[LiquidLevelDetectionAspirateOptions],
-) -> dict[int, ChannelAspirationResult]:
-    """Aspirates a specified volume of liquid from a location using pressure liquid level detection to detect the surface of the liquid. Returns a dictionary mapping channel numbers to the result of the operation."""
+) -> list[ChannelAspirationResult]:
+    """Aspirates a specified volume of liquid from a location using pressure liquid level detection to detect the surface of the liquid. Returns a list of results for each channel."""
     channel_configs = []
     for option in channel_options:
         config = Channel1000ulAspirateChannelConfig(
@@ -181,8 +187,8 @@ async def aspirate_with_pressure_liquid_level_detection(
 async def aspirate_at_height(
     context: Context,
     channel_options: list[HeightBasedAspirateOptions],
-) -> dict[int, ChannelAspirationResult]:
-    """Aspirates a specified volume of liquid from a location at a specified height. Returns a dictionary mapping channel numbers to the result of the operation."""
+) -> list[ChannelAspirationResult]:
+    """Aspirates a specified volume of liquid from a location at a specified height. Returns a list of results for each channel."""
     channel_configs = []
     for option in channel_options:
         config = Channel1000ulAspirateChannelConfig(

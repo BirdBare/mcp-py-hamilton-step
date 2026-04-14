@@ -73,6 +73,7 @@ class HeightBasedDispenseOptions(BaseDispenseOptions):
 
 
 class ChannelDispenseResult(BaseModel):
+    channel_number: int
     exception: str | None
     dispensed_volume_ul: float | None
     labware_id: str
@@ -82,27 +83,32 @@ class ChannelDispenseResult(BaseModel):
 def parse_response_data(
     channel_options: list[BaseDispenseOptions],
     response_json: dict,
-) -> dict[int, ChannelDispenseResult]:
+) -> list[ChannelDispenseResult]:
     response = Channel1000ulDispenseCommand.parse_response(response_json)
 
-    result: dict[int, typing.Any] = {option.channel_number: None for option in channel_options}
+    executed_channels = [option.channel_number for option in channel_options]
+
+    result = []
 
     for block_data in response.channel_sequences_with_recovery_details.block_data:
-        if block_data.num in result:
+        if block_data.num in executed_channels:
             if response.channel_sequences_with_recovery_details.err_flag == "Fatal error":
                 exception_name = "FatalError"
 
             elif block_data.main_err is None:
-                exception_name = "None"
+                exception_name = None
 
             else:
                 exception_name = block_data.main_err.__name__
 
-            result[block_data.num] = ChannelDispenseResult(
-                exception=exception_name,
-                dispensed_volume_ul=block_data.step_data,
-                labware_id=block_data.labware_name,
-                labware_position_id=block_data.labware_pos,
+            result.append(
+                ChannelDispenseResult(
+                    channel_number=block_data.num,
+                    exception=exception_name,
+                    dispensed_volume_ul=block_data.step_data,
+                    labware_id=block_data.labware_name,
+                    labware_position_id=block_data.labware_pos,
+                ),
             )
 
     return result
@@ -112,7 +118,7 @@ def parse_response_data(
 async def dispense_with_capacitive_liquid_level_detection(
     context: Context,
     channel_options: list[LiquidLevelDetectionDispenseOptions],
-) -> dict[int, ChannelDispenseResult]:
+) -> list[ChannelDispenseResult]:
     """Dispenses a specified volume of liquid from a location using capacitive liquid level detection to detect the surface of the liquid. Returns a dictionary mapping channel numbers to the result of the operation."""
     channel_configs = []
     for option in channel_options:
@@ -150,7 +156,7 @@ async def dispense_with_capacitive_liquid_level_detection(
 async def dispense_at_height(
     context: Context,
     channel_options: list[HeightBasedDispenseOptions],
-) -> dict[int, ChannelDispenseResult]:
+) -> list[ChannelDispenseResult]:
     """Dispenses a specified volume of liquid from a location at a specified height. Returns a dictionary mapping channel numbers to the result of the operation."""
     channel_configs = []
     for option in channel_options:
