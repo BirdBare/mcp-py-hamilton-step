@@ -31,8 +31,8 @@ CHANNEL_1000UL_ASPIRATE_PORT = int(os.getenv("VENUS_CHANNEL_1000UL_ASPIRATE_PORT
 # MCP Server
 #
 mcp = FastMCP(
-    "Hamilton Liquid Handling 1000uL Channel Aspirate",
-    instructions="Exposes aspirate functionality for 1mL channels on Hamilton liquid handler.",
+    "Venus 1000uL Channel Aspirate Liquid",
+    instructions="Exposes aspirate liquid functionality for 1mL channels on Hamilton liquid handler.",
     lifespan=executor_client_lifespan,
 )
 
@@ -61,7 +61,7 @@ class HeightBasedAspirateOptions(BaseAspirateOptions):
     height_from_bottom_mm: float
 
 
-class ChannelAspirationResult(BaseModel):
+class AspirateLiquidResult(BaseModel):
     channel_number: int
     exception: str | None
     aspirated_volume_ul: float | None
@@ -72,7 +72,7 @@ class ChannelAspirationResult(BaseModel):
 def parse_response_data(
     channel_options: list[BaseAspirateOptions],
     response_json: dict,
-) -> list[ChannelAspirationResult]:
+) -> list[AspirateLiquidResult]:
     response = Channel1000ulAspirateCommand.parse_response(response_json)
 
     executed_channels = [option.channel_number for option in channel_options]
@@ -91,7 +91,7 @@ def parse_response_data(
                 exception_name = block_data.main_err.__name__
 
             result.append(
-                ChannelAspirationResult(
+                AspirateLiquidResult(
                     channel_number=block_data.num,
                     exception=exception_name,
                     aspirated_volume_ul=block_data.step_data,
@@ -104,10 +104,10 @@ def parse_response_data(
 
 
 @mcp.tool
-async def aspirate_with_capacitive_liquid_level_detection(
+async def aspirate_liquid_with_capacitive_liquid_level_detection(
     context: Context,
     channel_options: list[LiquidLevelDetectionAspirateOptions],
-) -> list[ChannelAspirationResult]:
+) -> list[AspirateLiquidResult]:
     """Aspirates a specified volume of liquid from a location using capacitive liquid level detection to detect the surface of the liquid. Returns a list of results for each channel."""
     channel_configs = []
     for option in channel_options:
@@ -147,10 +147,10 @@ async def aspirate_with_capacitive_liquid_level_detection(
 
 
 @mcp.tool
-async def aspirate_with_pressure_liquid_level_detection(
+async def aspirate_liquid_with_pressure_liquid_level_detection(
     context: Context,
     channel_options: list[LiquidLevelDetectionAspirateOptions],
-) -> list[ChannelAspirationResult]:
+) -> list[AspirateLiquidResult]:
     """Aspirates a specified volume of liquid from a location using pressure liquid level detection to detect the surface of the liquid. Returns a list of results for each channel."""
     channel_configs = []
     for option in channel_options:
@@ -190,10 +190,10 @@ async def aspirate_with_pressure_liquid_level_detection(
 
 
 @mcp.tool
-async def aspirate_at_height(
+async def aspirate_liquid_at_height(
     context: Context,
     channel_options: list[HeightBasedAspirateOptions],
-) -> list[ChannelAspirationResult]:
+) -> list[AspirateLiquidResult]:
     """Aspirates a specified volume of liquid from a location at a specified height. Returns a list of results for each channel."""
     channel_configs = []
     for option in channel_options:

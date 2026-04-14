@@ -34,8 +34,8 @@ CHANNEL_1000UL_DISPENSE_PORT = int(os.getenv("VENUS_CHANNEL_1000UL_DISPENSE_PORT
 # MCP Server
 #
 mcp = FastMCP(
-    "Hamilton Liquid Handling 1000uL Channel Dispense",
-    instructions="Exposes dispense functionality for 1mL channels on Hamilton liquid handler.",
+    "Venus 1000uL Channel Dispense Liquid",
+    instructions="Exposes dispense liquid functionality for 1mL channels on Hamilton liquid handler.",
     lifespan=executor_client_lifespan,
 )
 
@@ -72,7 +72,7 @@ class HeightBasedDispenseOptions(BaseDispenseOptions):
     height_from_bottom_mm: float
 
 
-class ChannelDispenseResult(BaseModel):
+class DispenseLiquidResult(BaseModel):
     channel_number: int
     exception: str | None
     dispensed_volume_ul: float | None
@@ -83,7 +83,7 @@ class ChannelDispenseResult(BaseModel):
 def parse_response_data(
     channel_options: list[BaseDispenseOptions],
     response_json: dict,
-) -> list[ChannelDispenseResult]:
+) -> list[DispenseLiquidResult]:
     response = Channel1000ulDispenseCommand.parse_response(response_json)
 
     executed_channels = [option.channel_number for option in channel_options]
@@ -102,7 +102,7 @@ def parse_response_data(
                 exception_name = block_data.main_err.__name__
 
             result.append(
-                ChannelDispenseResult(
+                DispenseLiquidResult(
                     channel_number=block_data.num,
                     exception=exception_name,
                     dispensed_volume_ul=block_data.step_data,
@@ -115,11 +115,11 @@ def parse_response_data(
 
 
 @mcp.tool
-async def dispense_with_capacitive_liquid_level_detection(
+async def dispense_liquid_with_capacitive_liquid_level_detection(
     context: Context,
     channel_options: list[LiquidLevelDetectionDispenseOptions],
-) -> list[ChannelDispenseResult]:
-    """Dispenses a specified volume of liquid from a location using capacitive liquid level detection to detect the surface of the liquid. Returns a dictionary mapping channel numbers to the result of the operation."""
+) -> list[DispenseLiquidResult]:
+    """Dispenses a specified volume of liquid from a location using capacitive liquid level detection to detect the surface of the liquid. Returns a list of results for each channel."""
     channel_configs = []
     for option in channel_options:
         config = Channel1000ulDispenseChannelConfig(
@@ -156,10 +156,10 @@ async def dispense_with_capacitive_liquid_level_detection(
 
 
 @mcp.tool
-async def dispense_at_height(
+async def dispense_liquid_at_height(
     context: Context,
     channel_options: list[HeightBasedDispenseOptions],
-) -> list[ChannelDispenseResult]:
+) -> list[DispenseLiquidResult]:
     """Dispenses a specified volume of liquid from a location at a specified height. Returns a dictionary mapping channel numbers to the result of the operation."""
     channel_configs = []
     for option in channel_options:
