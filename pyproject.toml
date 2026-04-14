@@ -1,5 +1,5 @@
 [project]
-name = "mcp-py-hamilton-step"
+name = "mcp-py-venus-step"
 version = "0.1.0"
 authors = [{ name = "Bradley Bare", email = "bradleybare@gmail.com" }]
 requires-python = "==3.13.*"
@@ -8,7 +8,7 @@ dependencies = [
     "fastmcp>=3.2.3,<4",
     "pydantic>=2.12.5,<3", 
     "python-dotenv>=1.2.2,<2", 
-    "py-hamilton-step @ git+https://github.com/BirdBare/py-hamilton-step",
+    "py-venus-step @ git+https://github.com/BirdBare/py-venus-step",
 ]
 
 [build-system]
@@ -19,7 +19,7 @@ requires = ["hatchling"]
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/mcp_py_hamilton_step"]
+packages = ["src/mcp_py_venus_step"]
 
 [tool.uv]
 package = true
@@ -32,4 +32,4 @@ platforms = ["osx-arm64"]
 uv = ">=0.11.6,<0.12"
 
 [tool.pixi.tasks]
-mcp_device = {cmd="uv run device.py", cwd="src/mcp_py_hamilton_step/shared", env={HAMILTON_CONNECTION_MODE="SOCKET", HAMILTON_CONNECTION_PATH="/Users/birdbare/Parallels/venus_star.sock", HAMILTON_DEVICE_PORT="57000"}}
+executor_server = {cmd="uv run executor.py", cwd="src/mcp_py_venus_step/shared", env={VENUS_CONNECTION_MODE="SOCKET", VENUS_CONNECTION_PATH="/Users/birdbare/Parallels/venus_star.sock", VENUS_EXECUTOR_PORT="57000"}}

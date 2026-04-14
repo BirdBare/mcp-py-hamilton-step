@@ -3,13 +3,12 @@ import typing
 
 import dotenv
 from fastmcp import Client, Context, FastMCP
-from py_hamilton_step.ml_star import (
+from mcp_py_venus_step.shared.executor import executor_client_lifespan
+from py_venus_step.ml_star import (
     Channel1000ulDispenseChannelConfig,
     Channel1000ulDispenseCommand,
 )
 from pydantic import BaseModel
-
-from mcp_py_hamilton_step.shared.device import device_operation_lifespan
 
 dotenv.load_dotenv()
 
@@ -18,17 +17,17 @@ dotenv.load_dotenv()
 #
 # Required environment variables:
 # MCP_TRANSPORT: Determines the transport method for the MCP server. Can be either 'stdio' or 'http'. Defaults to 'stdio'.
-# HAMILTON_DEVICE_PORT: The port number for the Hamilton device MCP server. Always runs in http mode. Defaults to 57000.
+# VENUS_EXECUTOR_PORT: The port number for the Hamilton executor server. Always runs in http mode. Defaults to 57000.
 #
 # Optional environment variables:
-# HAMILTON_CHANNEL_1000UL_DISPENSE_PORT: The port number for the 1000uL channel dispense MCP server if MCP_TRANSPORT is 'http'. Defaults to 57002.
+# VENUS_CHANNEL_1000UL_DISPENSE_PORT: The port number for the 1000uL channel dispense MCP server if MCP_TRANSPORT is 'http'. Defaults to 57002.
 
 MCP_TRANSPORT = typing.cast("typing.Literal['stdio', 'http']", os.getenv("MCP_TRANSPORT", "stdio"))
 
 if MCP_TRANSPORT not in ("stdio", "http"):
     raise ValueError(f"Invalid MCP_TRANSPORT: {MCP_TRANSPORT}. Must be 'stdio' or 'http'.")
 
-CHANNEL_1000UL_DISPENSE_PORT = int(os.getenv("HAMILTON_CHANNEL_1000UL_DISPENSE_PORT", "57002"))
+CHANNEL_1000UL_DISPENSE_PORT = int(os.getenv("VENUS_CHANNEL_1000UL_DISPENSE_PORT", "57002"))
 
 #
 # MCP Server
@@ -36,7 +35,7 @@ CHANNEL_1000UL_DISPENSE_PORT = int(os.getenv("HAMILTON_CHANNEL_1000UL_DISPENSE_P
 mcp = FastMCP(
     "Hamilton Liquid Handling 1000uL Channel Dispense",
     instructions="Exposes dispense functionality for 1mL channels on Hamilton liquid handler.",
-    lifespan=device_operation_lifespan,
+    lifespan=executor_client_lifespan,
 )
 
 
@@ -144,8 +143,8 @@ async def dispense_with_capacitive_liquid_level_detection(
 
     command = Channel1000ulDispenseCommand(channel_configs=tuple(channel_configs))
 
-    device_client: Client = context.lifespan_context["device_client"]
-    call_tool_data = await device_client.call_tool("execute_command", {"command_json": command.as_dict()})
+    executor_client: Client = context.lifespan_context["executor_client"]
+    call_tool_data = await executor_client.call_tool("execute_command", {"command_json": command.as_dict()})
 
     response_data = call_tool_data.data
 
@@ -182,8 +181,8 @@ async def dispense_at_height(
 
     command = Channel1000ulDispenseCommand(channel_configs=tuple(channel_configs))
 
-    device_client: Client = context.lifespan_context["device_client"]
-    call_tool_data = await device_client.call_tool("execute_command", {"command_json": command.as_dict()})
+    executor_client: Client = context.lifespan_context["executor_client"]
+    call_tool_data = await executor_client.call_tool("execute_command", {"command_json": command.as_dict()})
 
     response_data = call_tool_data.data
 

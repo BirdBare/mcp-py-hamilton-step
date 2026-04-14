@@ -5,7 +5,7 @@ from peewee import Model, SqliteDatabase
 
 dotenv.load_dotenv()
 
-DB_PATH = os.getenv("HAMILTON_DB_PATH", "hamilton.db")
+DB_PATH = os.getenv("VENUS_DB_PATH", "venus.db")
 
 db = SqliteDatabase(DB_PATH)
 
