@@ -32,4 +32,4 @@ platforms = ["osx-arm64"]
 uv = ">=0.11.6,<0.12"
 
 [tool.pixi.tasks]
-mcp_device = {cmd="uv run device.py", cwd="src/mcp_py_hamilton_step/shared", env={HAMILTON_CONNECTION_MODE="SOCKET", HAMILTON_CONNECTION_PATH="/Users/birdbare/Parallels/venus_star.sock", HAMILTON_DEVICE_PORT="57005"}}
+mcp_device = {cmd="uv run device.py", cwd="src/mcp_py_hamilton_step/shared", env={HAMILTON_CONNECTION_MODE="SOCKET", HAMILTON_CONNECTION_PATH="/Users/birdbare/Parallels/venus_star.sock", HAMILTON_DEVICE_PORT="57000"}}
