@@ -3,9 +3,10 @@ import typing
 
 import dotenv
 from fastmcp import Client, Context, FastMCP
-from mcp_py_venus_step.shared.executor import executor_client_lifespan
 from py_venus_step.ml_star import Channel1000ulTipEjectChannelConfig, Channel1000ulTipEjectCommand
 from pydantic import BaseModel
+
+from mcp_py_venus_step.shared.executor import executor_client_lifespan
 
 dotenv.load_dotenv()
 
@@ -93,7 +94,10 @@ async def tip_eject(
     channel_configs = []
     for option in channel_options:
         config = Channel1000ulTipEjectChannelConfig(
-            channel_number=typing.cast("typing.Literal[1, 2, 3, 4, 5, 6, 7, 8]", option.channel_number),
+            channel_number=typing.cast(
+                "typing.Literal[1, 2, 3, 4, 5, 6, 7, 8,9,10,11,12,13,14,15,16]",
+                option.channel_number,
+            ),
             sequence_labware=option.labware_id,
             sequence_position=option.labware_position_id,
         )

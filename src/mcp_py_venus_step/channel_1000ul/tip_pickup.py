@@ -94,7 +94,10 @@ async def tip_pickup(
     channel_configs = []
     for option in channel_options:
         config = Channel1000ulTipPickupChannelConfig(
-            channel_number=typing.cast("typing.Literal[1, 2, 3, 4, 5, 6, 7, 8]", option.channel_number),
+            channel_number=typing.cast(
+                "typing.Literal[1, 2, 3, 4, 5, 6, 7, 8,9,10,11,12,13,14,15,16]",
+                option.channel_number,
+            ),
             sequence_labware=option.labware_id,
             sequence_position=option.labware_position_id,
         )

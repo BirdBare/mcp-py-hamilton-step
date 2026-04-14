@@ -48,7 +48,7 @@ class BaseAspirateOptions(BaseModel):
     aspirate_mode: typing.Literal["Aspiration", "Consecutive aspiration", "Aspirate all"] = "Aspiration"
     liquid_class: str
     retract_distance_for_transport_air_mm: float = 5
-    liquid_following: typing.Literal["Off", "On"] = "On"
+    liquid_following: bool = True
     mix_cycles: int = 0
     mix_volume_ul: float = 0
 
@@ -112,7 +112,10 @@ async def aspirate_with_capacitive_liquid_level_detection(
     channel_configs = []
     for option in channel_options:
         config = Channel1000ulAspirateChannelConfig(
-            channel_number=typing.cast("typing.Literal[1, 2, 3, 4, 5, 6, 7, 8]", option.channel_number),
+            channel_number=typing.cast(
+                "typing.Literal[1, 2, 3, 4, 5, 6, 7, 8,9,10,11,12,13,14,15,16]",
+                option.channel_number,
+            ),
             sequence_labware=option.labware_id,
             sequence_position=option.labware_position_id,
             volume_ul=option.volume_ul,
@@ -121,13 +124,13 @@ async def aspirate_with_capacitive_liquid_level_detection(
             capacitive_lld_sensitivity="From labware definition",
             pressure_lld_sensitivity="Off",
             fix_height_from_bottom_mm=0,  # Field does not matter in this context but included for brevity.
-            touch_off="Off",
+            touch_off=False,
             submerge_depth_mm=option.submerge_depth_mm,
             max_height_difference_mm=0,  # Field does not matter in this context but included for brevity.
             retract_distance_for_transport_air_mm=option.retract_distance_for_transport_air_mm,
             aspiration_position_above_touch_mm=0,  # Field does not matter in this context but included for brevity.
             liquid_following_during_aspirate_and_mix=option.liquid_following,
-            cycles=option.mix_cycles,
+            mix_cycles=option.mix_cycles,
             mix_position_mm=option.submerge_depth_mm,  # Use submerge depth to align aspiration position and mix position.
             mix_volume_ul=option.mix_volume_ul,
         )
@@ -152,7 +155,10 @@ async def aspirate_with_pressure_liquid_level_detection(
     channel_configs = []
     for option in channel_options:
         config = Channel1000ulAspirateChannelConfig(
-            channel_number=typing.cast("typing.Literal[1, 2, 3, 4, 5, 6, 7, 8]", option.channel_number),
+            channel_number=typing.cast(
+                "typing.Literal[1, 2, 3, 4, 5, 6, 7, 8,9,10,11,12,13,14,15,16]",
+                option.channel_number,
+            ),
             sequence_labware=option.labware_id,
             sequence_position=option.labware_position_id,
             volume_ul=option.volume_ul,
@@ -161,13 +167,13 @@ async def aspirate_with_pressure_liquid_level_detection(
             capacitive_lld_sensitivity="Off",
             pressure_lld_sensitivity="From labware definition",
             fix_height_from_bottom_mm=0,  # Field does not matter in this context but included for brevity.
-            touch_off="Off",
+            touch_off=False,
             submerge_depth_mm=option.submerge_depth_mm,
             max_height_difference_mm=0,  # Field does not matter in this context but included for brevity.
             retract_distance_for_transport_air_mm=option.retract_distance_for_transport_air_mm,
             aspiration_position_above_touch_mm=0,  # Field does not matter in this context but included for brevity.
             liquid_following_during_aspirate_and_mix=option.liquid_following,
-            cycles=option.mix_cycles,
+            mix_cycles=option.mix_cycles,
             mix_position_mm=option.submerge_depth_mm,  # Use submerge depth to align aspiration position and mix position.
             mix_volume_ul=option.mix_volume_ul,
         )
@@ -192,7 +198,10 @@ async def aspirate_at_height(
     channel_configs = []
     for option in channel_options:
         config = Channel1000ulAspirateChannelConfig(
-            channel_number=typing.cast("typing.Literal[1, 2, 3, 4, 5, 6, 7, 8]", option.channel_number),
+            channel_number=typing.cast(
+                "typing.Literal[1, 2, 3, 4, 5, 6, 7, 8,9,10,11,12,13,14,15,16]",
+                option.channel_number,
+            ),
             sequence_labware=option.labware_id,
             sequence_position=option.labware_position_id,
             volume_ul=option.volume_ul,
@@ -201,13 +210,13 @@ async def aspirate_at_height(
             capacitive_lld_sensitivity="Off",
             pressure_lld_sensitivity="Off",
             fix_height_from_bottom_mm=option.height_from_bottom_mm,
-            touch_off="Off",
+            touch_off=False,
             submerge_depth_mm=0,  # Field does not matter in this context but included for brevity.
             max_height_difference_mm=0,  # Field does not matter in this context but included for brevity.
             retract_distance_for_transport_air_mm=option.retract_distance_for_transport_air_mm,
             aspiration_position_above_touch_mm=0,  # Field does not matter in this context but included for brevity.
             liquid_following_during_aspirate_and_mix=option.liquid_following,
-            cycles=option.mix_cycles,
+            mix_cycles=option.mix_cycles,
             mix_position_mm=0,  # Field does not matter in this context but included for brevity.
             mix_volume_ul=option.mix_volume_ul,
         )

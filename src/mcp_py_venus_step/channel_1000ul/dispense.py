@@ -3,12 +3,13 @@ import typing
 
 import dotenv
 from fastmcp import Client, Context, FastMCP
-from mcp_py_venus_step.shared.executor import executor_client_lifespan
 from py_venus_step.ml_star import (
     Channel1000ulDispenseChannelConfig,
     Channel1000ulDispenseCommand,
 )
 from pydantic import BaseModel
+
+from mcp_py_venus_step.shared.executor import executor_client_lifespan
 
 dotenv.load_dotenv()
 
@@ -58,7 +59,7 @@ class BaseDispenseOptions(BaseModel):
     ] = "From liquid class definition"
     retract_distance_for_transport_air_mm: float = 5
     liquid_class: str
-    liquid_following: typing.Literal["Off", "On"] = "On"
+    liquid_following: bool = True
     mix_cycles: int = 0
     mix_volume_ul: float = 0
 
@@ -122,20 +123,23 @@ async def dispense_with_capacitive_liquid_level_detection(
     channel_configs = []
     for option in channel_options:
         config = Channel1000ulDispenseChannelConfig(
-            channel_number=typing.cast("typing.Literal[1, 2, 3, 4, 5, 6, 7, 8]", option.channel_number),
+            channel_number=typing.cast(
+                "typing.Literal[1, 2, 3, 4, 5, 6, 7, 8,9,10,11,12,13,14,15,16]",
+                option.channel_number,
+            ),
             sequence_labware=option.labware_id,
             sequence_position=option.labware_position_id,
             volume_ul=option.volume_ul,
             dispense_mode=option.dispense_mode,
             fix_height_from_bottom_mm=0,  # Field does not matter in this context but included for brevity.
             capacitive_lld_sensitivity="From labware definition",
-            touch_off="Off",
+            touch_off=False,
             retract_distance_for_transport_air_mm=option.retract_distance_for_transport_air_mm,
             submerge_depth_mm=option.submerge_depth_mm,
             dispense_position_above_touch_mm=0,  # Field does not matter in this context but included for brevity.
             liquid_class=option.liquid_class,
             liquid_following_during_dispense_and_mix=option.liquid_following,
-            cycles=option.mix_cycles,
+            mix_cycles=option.mix_cycles,
             mix_position_mm=option.submerge_depth_mm,  # Use submerge depth to align aspiration position and mix position.
             mix_volume_ul=option.mix_volume_ul,
         )
@@ -160,20 +164,23 @@ async def dispense_at_height(
     channel_configs = []
     for option in channel_options:
         config = Channel1000ulDispenseChannelConfig(
-            channel_number=typing.cast("typing.Literal[1, 2, 3, 4, 5, 6, 7, 8]", option.channel_number),
+            channel_number=typing.cast(
+                "typing.Literal[1, 2, 3, 4, 5, 6, 7, 8,9,10,11,12,13,14,15,16]",
+                option.channel_number,
+            ),
             sequence_labware=option.labware_id,
             sequence_position=option.labware_position_id,
             volume_ul=option.volume_ul,
             dispense_mode=option.dispense_mode,
             fix_height_from_bottom_mm=option.height_from_bottom_mm,
             capacitive_lld_sensitivity="Off",
-            touch_off="Off",
+            touch_off=False,
             retract_distance_for_transport_air_mm=option.retract_distance_for_transport_air_mm,
             submerge_depth_mm=0,  # Field does not matter in this context but included for brevity.
             dispense_position_above_touch_mm=0,  # Field does not matter in this context but included for brevity.
             liquid_class=option.liquid_class,
             liquid_following_during_dispense_and_mix=option.liquid_following,
-            cycles=option.mix_cycles,
+            mix_cycles=option.mix_cycles,
             mix_position_mm=0,  # Field does not matter in this context but included for brevity.
             mix_volume_ul=option.mix_volume_ul,
         )
